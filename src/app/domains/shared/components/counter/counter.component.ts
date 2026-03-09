@@ -10,6 +10,8 @@ import {
   // linkedSignal,
   // output,
   model,
+  afterNextRender,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -17,6 +19,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-counter',
   imports: [CommonModule],
   templateUrl: './counter.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CounterComponent
   implements /*OnChanges,*/ OnInit, AfterViewInit, OnDestroy
@@ -26,7 +29,7 @@ export class CounterComponent
   $message = model.required<string>({ alias: 'message' });
   // $newMessage = linkedSignal(() => this.$message());
   $counter = signal(0);
-  counterRef: number | undefined;
+  counterRef: number | null = null;
   // changeMessage = output<string>();
 
   constructor() {
@@ -39,6 +42,13 @@ export class CounterComponent
     effect(() => {
       this.$duration();
       this.doSomething();
+    });
+
+    afterNextRender(() => {
+      this.counterRef = window.setInterval(() => {
+        console.log('run interval');
+        this.$counter.update(statePrev => statePrev + 1);
+      }, 1000);
     });
   }
 
@@ -61,10 +71,6 @@ export class CounterComponent
     console.log('-'.repeat(10));
     console.log('duration =>', this.$duration());
     console.log('message =>', this.$message());
-    this.counterRef = window.setInterval(() => {
-      console.log('run interval');
-      this.$counter.update(statePrev => statePrev + 1);
-    }, 1000);
   }
 
   ngAfterViewInit() {
@@ -77,7 +83,10 @@ export class CounterComponent
   ngOnDestroy() {
     console.log('ngOnDestroy');
     console.log('-'.repeat(10));
-    window.clearInterval(this.counterRef);
+
+    if (this.counterRef) {
+      window.clearInterval(this.counterRef);
+    }
   }
 
   doSomething() {

@@ -1,4 +1,4 @@
-@let data = product();
+@let data = productRs.value();
 @let cover = $cover();
 
 @if (data) {
@@ -51,4 +51,12 @@
       </button>
     </div>
   </div>
+
+  <div class="mt-80"></div>
+
+  @defer (on viewport) {
+    <app-related [slug]="data.slug" />
+  } @placeholder {
+    <p>Loading ...</p>
+  }
 }

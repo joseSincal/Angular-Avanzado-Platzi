@@ -31,4 +31,10 @@ export class ProductService {
       `${environment.apiUrl}/api/v1/products/slug/${slug}`
     );
   }
+
+  getRelatedProducts(slug: string) {
+    return this.http.get<Product[]>(
+      `${environment.apiUrl}/api/v1/products/slug/${slug}/related`
+    );
+  }
 }
